@@ -18,7 +18,7 @@ def detect_ela(image_path):
     # -------------------------------
     temp_path = "static/uploads/temp_resaved.jpg"
 
-    original.save(temp_path, "JPEG", quality=90)
+    original.save(temp_path, "JPEG", quality=60)
 
     resaved = Image.open(temp_path)
 
