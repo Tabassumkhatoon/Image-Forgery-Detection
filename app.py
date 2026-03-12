@@ -53,25 +53,25 @@ def upload_image():
             # =====================================
             # RUN FORENSIC ANALYSIS
             # =====================================
-            print("\nRunning analysis...")
+            print("\n📊 Running analysis...")
             print("-"*70)
             
             ela_path, heatmap_path, boxed_path, ela_score = detect_ela(upload_path)
-            print(f"ELA Detection: {ela_score}")
+            print(f"✓ ELA Detection: {ela_score}")
             
             noise_path, hist_path, edge_path, noise_score, uniformity_score = detect_noise(upload_path)
-            print(f"Noise Detection: {noise_score}")
-            print(f"Uniformity Score: {uniformity_score}")
+            print(f"✓ Noise Detection: {noise_score}")
+            print(f"✓ Uniformity Score: {uniformity_score}")
 
             # =====================================
             # NORMALIZE SCORES (0 - 100)
             # =====================================
-            print("\nNormalizing scores...")
+            print("\n📈 Normalizing scores...")
             print("-"*70)
             
-            # Fixed normalization
+            # FINAL FIXED: Proper normalization
             ela_score_normalized = min(max(ela_score * 3, 0), 100)
-            noise_score_normalized = min(max(noise_score * 1.5, 0), 100)  # REDUCED multiplier
+            noise_score_normalized = min(max(noise_score * 1.5, 0), 100)
             uniformity_score_normalized = min(max(uniformity_score, 0), 100)
 
             print(f"ELA Score (raw: {ela_score} → norm): {ela_score_normalized}")
@@ -79,12 +79,12 @@ def upload_image():
             print(f"Uniformity Score: {uniformity_score_normalized}")
 
             # =====================================
-            # FINAL SCORING - FIXED
+            # FINAL SCORING
             # =====================================
-            print("\nCalculating final score...")
+            print("\n🎯 Calculating final score...")
             print("-"*70)
             
-            # FINAL WORKING WEIGHTS
+            # FINAL WORKING FORMULA
             final_score = round(
                 (ela_score_normalized * 0.15) +      # ELA: 15%
                 (noise_score_normalized * 0.4) +     # Noise: 40%
@@ -95,49 +95,49 @@ def upload_image():
             final_score = min(max(final_score, 0), 100)
 
             print(f"Calculation breakdown:")
-            print(f"  ELA contribution (0.15):    {ela_score_normalized * 0.15:.2f}")
-            print(f"  Noise contribution (0.4):   {noise_score_normalized * 0.4:.2f}")
-            print(f"  Uniformity contrib (0.15):  {(100 - uniformity_score_normalized) * 0.15:.2f}")
+            print(f"  ELA contribution (×0.15):    {ela_score_normalized * 0.15:.2f}")
+            print(f"  Noise contribution (×0.4):   {noise_score_normalized * 0.4:.2f}")
+            print(f"  Uniformity contrib (×0.15):  {(100 - uniformity_score_normalized) * 0.15:.2f}")
             print(f"  ─────────────────────────────")
             print(f"  FINAL SCORE:                 {final_score}")
 
             # =====================================
-            # CLASSIFICATION - FINAL THRESHOLDS
+            # CLASSIFICATION - FINAL
             # =====================================
-            print("\nClassification...")
+            print("\n🔍 Classification...")
             print("-"*70)
             
-            print(f"Thresholds:")
-            print(f"  >= 60: FAKE (high confidence)")
-            print(f"  50-60: LIKELY FAKE")
-            print(f"  40-50: SUSPICIOUS")
-            print(f"  < 40:  REAL (high confidence)")
+            print(f"Score Ranges:")
+            print(f"  < 30:     REAL (high confidence)")
+            print(f"  30-40:    SUSPICIOUS")
+            print(f"  40-50:    LIKELY FAKE")
+            print(f"  >= 50:    FAKE (high confidence)")
             print(f"\nFinal Score: {final_score}")
             
-            if final_score >= 60:
+            if final_score >= 50:
                 verdict = "FAKE"
                 verdict_color = "#D9534F"
                 risk_level = "HIGH"
                 confidence = final_score
-                print(f"VERDICT: {verdict} (Risk: {risk_level}, Confidence: {confidence}%)")
-            elif final_score >= 50:
+                print(f"✓ VERDICT: {verdict} (Risk: {risk_level}, Confidence: {confidence}%)")
+            elif final_score >= 40:
                 verdict = "LIKELY FAKE"
                 verdict_color = "#EC971F"
                 risk_level = "MEDIUM-HIGH"
                 confidence = final_score
-                print(f"VERDICT: {verdict} (Risk: {risk_level}, Confidence: {confidence}%)")
-            elif final_score >= 40:
+                print(f"✓ VERDICT: {verdict} (Risk: {risk_level}, Confidence: {confidence}%)")
+            elif final_score >= 30:
                 verdict = "SUSPICIOUS"
                 verdict_color = "#F0AD4E"
                 risk_level = "MEDIUM"
                 confidence = final_score
-                print(f"VERDICT: {verdict} (Risk: {risk_level}, Confidence: {confidence}%)")
+                print(f"✓ VERDICT: {verdict} (Risk: {risk_level}, Confidence: {confidence}%)")
             else:
                 verdict = "REAL"
                 verdict_color = "#3FAF9A"
                 risk_level = "LOW"
                 confidence = round(100 - final_score, 2)
-                print(f"VERDICT: {verdict} (Risk: {risk_level}, Confidence: {confidence}%)")
+                print(f"✓ VERDICT: {verdict} (Risk: {risk_level}, Confidence: {confidence}%)")
 
             print("="*70 + "\n")
 
@@ -165,7 +165,7 @@ def upload_image():
 
         except Exception as e:
             print("\n" + "="*70)
-            print("ERROR OCCURRED")
+            print("❌ ERROR OCCURRED")
             print("="*70)
             print(f"Error: {e}")
             import traceback
